@@ -1,8 +1,13 @@
 // sketch.js - p5 driven by Pi notifications
 
-const SMALL_CIRCLE_RADIUS = 5;
-const LARGE_CIRCLE_RADIUS = 10;
-const FALL_ACCELERATION = 0.4;
+// ===== CONFIGURATION =====
+// Set to true to use Raspberry Pi WebSocket, false to use system clock
+const USE_RASPBERRY_PI = true;
+// =========================
+
+const SMALL_CIRCLE_RADIUS = 8;
+const LARGE_CIRCLE_RADIUS = 14;
+const FALL_ACCELERATION = 0.7;
 const SIDE_FORCE = 0.05;
 const REPULSION_FORCE = 1.2;
 const REPULSION_RADIUS = 40;
@@ -10,8 +15,8 @@ const DAMPING = 0.88;
 const SETTLE_Y = 0.6;
 const MAX_FALL_SPEED = 12;
 const FRICTION = 0.87;
-const LEFT_X = 0.40;
-const RIGHT_X = 0.60;
+const LEFT_X = 0.20;
+const RIGHT_X = 0.80;
 
 let drops = [];
 let largeCircles = [];
@@ -19,8 +24,13 @@ let aloneRatios = [];
 let dropCount = 0;
 
 let socket;
+let serverFont;
+let lastDripTime = 0;
+const DRIP_INTERVAL = 1000;
 
 function preload() {
+  serverFont = loadFont('ServerMono-Regular.otf');
+  
   loadTable('alone_ratio_by_hour.csv', 'csv', 'header', 
     (table) => {
       console.log('Table loaded, rows:', table.getRowCount());
@@ -38,43 +48,52 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  textFont(serverFont);
 
-  // WebSocket to Pi (same origin if served by Pi)
-  // If you serve server on pi:3000, the WS uses the same host but ws protocol:
-  // For simplicity we use the same host/port the page was loaded from:
-  const loc = window.location;
-  const wsProtocol = loc.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsUrl = wsProtocol + '//' + loc.host; // server runs on same host:port
-  socket = new WebSocket(wsUrl);
+  if (USE_RASPBERRY_PI) {
+    // ===== RASPBERRY PI MODE =====
+    // WebSocket to Pi (same origin if served by Pi)
+    const loc = window.location;
+    const wsProtocol = loc.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = wsProtocol + '//' + loc.host;
+    socket = new WebSocket(wsUrl);
 
-  socket.onopen = () => {
-    console.log('WebSocket connected to', wsUrl);
-  };
+    socket.onopen = () => {
+      console.log('WebSocket connected to', wsUrl);
+    };
 
-  socket.onmessage = (ev) => {
-    try {
-      const msg = JSON.parse(ev.data);
-      if (msg.type === 'DRIP_END') {
-        // Start a new drop as soon as Arduino finishes LED
-        createDrop();
-      } else if (msg.type === 'TICK') {
-        // optional: use tick to schedule or show time; we don't use internal timer
-        // console.log('Tick from Pi:', new Date(msg.time).toLocaleTimeString());
+    socket.onmessage = (ev) => {
+      try {
+        const msg = JSON.parse(ev.data);
+        if (msg.type === 'DRIP_END') {
+          createDrop();
+        } else if (msg.type === 'TICK') {
+          // console.log('Tick from Pi:', new Date(msg.time).toLocaleTimeString());
+        }
+      } catch (err) {
+        console.error('Failed parse ws message', err, ev.data);
       }
-    } catch (err) {
-      console.error('Failed parse ws message', err, ev.data);
-    }
-  };
+    };
 
-  socket.onclose = () => console.log('WebSocket closed');
-  socket.onerror = (e) => console.error('WebSocket error', e);
+    socket.onclose = () => console.log('WebSocket closed');
+    socket.onerror = (e) => console.error('WebSocket error', e);
+  } else {
+    // ===== SYSTEM CLOCK MODE =====
+    lastDripTime = millis();
+  }
 }
 
 function draw() {
   background(0);
-  noFill();
-  stroke('#fffff1');
-  strokeWeight(1.5);
+
+  // System clock mode: create drip every second
+  if (!USE_RASPBERRY_PI) {
+    if (millis() - lastDripTime >= DRIP_INTERVAL) {
+      createDrop();
+      lastDripTime = millis();
+    }
+  }
+  // Pi mode: drips created via WebSocket in setup()
 
   if (largeCircles.length >= 60) {
     reset();
@@ -93,10 +112,12 @@ function draw() {
   if (frameCount % 10 === 0) {
     checkConsolidation();
   }
+
+  drawLabels();
+  drawLegend();
 }
 
 function createDrop() {
-  // Use browser hour() or fallback to system hour
   let currentHour = hour();
   let aloneRatio = aloneRatios[currentHour] || 0.5;
   let isAlone = random() < aloneRatio;
@@ -135,11 +156,11 @@ function reset() {
   dropCount = 0;
 }
 
-// ---------- Classes (same as your code) ----------
+
 class Drop {
   constructor(isAlone) {
     this.x = width / 2;
-    this.y = 0;
+    this.y = height / 2;
     this.vx = 0;
     this.vy = 0;
     this.isAlone = isAlone;
@@ -228,6 +249,14 @@ class Drop {
   }
 
   display() {
+    if (this.isAlone) {
+      noFill();
+      stroke('#fffff1');
+      strokeWeight(1.5);
+    } else {
+      fill('#fffff1');
+      noStroke();
+    }
     circle(this.x, this.y, SMALL_CIRCLE_RADIUS * 2);
   }
 }
@@ -282,6 +311,52 @@ class LargeCircle {
   }
 
   display() {
+    if (this.isAlone) {
+      noFill();
+      stroke('#fffff1');
+      strokeWeight(1.5);
+    } else {
+      fill('#fffff1');
+      noStroke();
+    }
     circle(this.x, this.y, LARGE_CIRCLE_RADIUS * 2);
   }
+}
+
+function drawLabels() {
+  fill('#fffff1');
+  noStroke();
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  
+  text('alone', width * LEFT_X, height * 0.1);
+  text('with others', width * RIGHT_X, height * 0.1);
+}
+
+function drawLegend() {
+  fill('#fffff1');
+  noStroke();
+  textAlign(LEFT, CENTER);
+  textSize(14);
+  
+  let legendX = 20;
+  let legendY = height - 60;
+  
+  noFill();
+  stroke('#fffff1');
+  strokeWeight(1.5);
+  circle(legendX + 10, legendY, SMALL_CIRCLE_RADIUS * 2);
+  
+  fill('#fffff1');
+  noStroke();
+  text(' 01 person', legendX + 25, legendY);
+  
+  noFill();
+  stroke('#fffff1');
+  strokeWeight(1.5);
+  circle(legendX + 10, legendY + 30, LARGE_CIRCLE_RADIUS * 2);
+  
+  fill('#fffff1');
+  noStroke();
+  text(' 60 people', legendX + 25, legendY + 30);
 }
