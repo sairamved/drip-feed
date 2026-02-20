@@ -15,6 +15,7 @@ The work is motivated by trends in data over the years where time spent with oth
 ## Components
 
 - Physical IV drip stand with LED strip and LCD screen
+- Raspberry Pi
 - Web-based data visualization (accessed via QR code at the installation)
 - Data from the [2024 American Time Use Survey](https://www.bls.gov/tus/data/datafiles-2024.htm)
 
