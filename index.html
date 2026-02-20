@@ -3,23 +3,904 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DripFeed</title>
+  <title>Drip Feed</title>
   <style>
-    body {
+    @font-face {
+      font-family: 'Averia Serif Libre';
+      src: url('assets/Averia_Serif_Libre/AveriaSerifLibre-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Averia Serif Libre';
+      src: url('assets/Averia_Serif_Libre/AveriaSerifLibre-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Averia Serif Libre';
+      src: url('assets/Averia_Serif_Libre/AveriaSerifLibre-Italic.ttf') format('truetype');
+      font-weight: 400;
+      font-style: italic;
+    }
+    @font-face {
+      font-family: 'Averia Serif Libre';
+      src: url('assets/Averia_Serif_Libre/AveriaSerifLibre-Light.ttf') format('truetype');
+      font-weight: 300;
+      font-style: normal;
+    }
+
+    * {
       margin: 0;
       padding: 0;
-      background-color: black;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: Arial, sans-serif;
-      font-size: 2rem;
+      box-sizing: border-box;
     }
+
+    :root {
+      --bg: #111111;
+      --fg: #FFFFF8;
+      --fg-dim: rgba(255, 255, 248, 0.3);
+      --fg-faint: rgba(255, 255, 248, 0.08);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      position: relative;
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: 'Averia Serif Libre', Georgia, serif;
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--fg-dim);
+      border-radius: 2px;
+    }
+
+    /* ── Main container ── */
+    main {
+      position: relative;
+      z-index: 2;
+      max-width: 460px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-svg-container {
+      position: relative;
+      width: 120px;
+      height: 520px;
+      margin-bottom: 32px;
+    }
+
+    .hero-svg-container svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Drip animation along the bezier tube path */
+    .drip-path {
+      stroke-dasharray: 4 6;
+      animation: drip-flow 0.8s linear infinite;
+    }
+    @keyframes drip-flow {
+      from { stroke-dashoffset: 10; }
+      to   { stroke-dashoffset: 0; }
+    }
+
+    .hero h1 {
+      font-size: 2.4rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      margin-bottom: 12px;
+    }
+
+    .hero .subtitle {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      font-weight: 300;
+    }
+
+
+    /* ── Sections ── */
+    section {
+      padding: 48px 0;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Full-page drip line ── */
+    .drip-line {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 1px;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 248, 0.2);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .drip-line .drip-drop {
+      position: absolute;
+      left: 50%;
+      width: 8px;
+      height: 14px;
+      margin-left: -4px;
+      background: #FFFFF8;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      top: 0;
+    }
+
+    /* ── Credits ── */
+    .credits {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--fg-dim);
+      line-height: 1.8;
+    }
+    .credits a {
+      color: var(--fg);
+      text-decoration: none;
+      border-bottom: 1px solid var(--fg-dim);
+      transition: border-color 0.3s;
+    }
+    .credits a:hover {
+      border-color: var(--fg);
+    }
+
+    /* ── Description text ── */
+    .desc {
+      font-size: 0.92rem;
+      line-height: 1.75;
+      color: rgba(255, 255, 248, 0.85);
+      max-width: 45%;
+    }
+    .desc strong {
+      color: var(--fg);
+      font-weight: 700;
+    }
+    .desc em {
+      font-style: italic;
+      color: var(--fg);
+    }
+    .desc a {
+      color: var(--fg);
+      text-decoration: none;
+      border-bottom: 1px solid var(--fg-dim);
+      transition: border-color 0.3s;
+    }
+    .desc a:hover {
+      border-color: var(--fg);
+    }
+
+    .desc-small {
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 248, 0.5);
+      max-width: 45%;
+      margin-left: auto;
+    }
+    .desc-small a {
+      color: var(--fg);
+      text-decoration: none;
+      border-bottom: 1px solid var(--fg-dim);
+      transition: border-color 0.3s;
+    }
+    .desc-small a:hover {
+      border-color: var(--fg);
+    }
+
+    /* ── Digital visualization (canvas) ── */
+    .viz-section {
+      position: relative;
+    }
+
+    .viz-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      font-weight: 300;
+    }
+
+    .viz-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      border: 1px solid var(--fg-faint);
+      border-radius: 4px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .viz-frame canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .viz-labels-overlay {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+      pointer-events: none;
+    }
+
+    .viz-stat-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      border-top: 1px solid var(--fg-faint);
+      background: rgba(17, 17, 17, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .viz-stat {
+      flex: 1;
+      text-align: center;
+      padding: 12px 8px;
+    }
+    .viz-stat:first-child {
+      border-right: 1px solid var(--fg-faint);
+    }
+    .viz-stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: block;
+    }
+    .viz-stat-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      margin-top: 2px;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-top: 16px;
+      width: 100%;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.65rem;
+      color: var(--fg-dim);
+      letter-spacing: 0.1em;
+    }
+    .legend-circle-small {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1.5px solid var(--fg);
+      flex-shrink: 0;
+    }
+    .legend-circle-large {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid var(--fg);
+      flex-shrink: 0;
+    }
+
+    /* ── Photo / BTS ── */
+    .photo-frame {
+      width: 100%;
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+    .photo-frame img {
+      width: 100%;
+      display: block;
+      filter: grayscale(1) contrast(1.1);
+      transition: filter 0.5s ease;
+    }
+    .photo-frame:hover img {
+      filter: grayscale(0.3) contrast(1.05);
+    }
+
+    /* ── Trend text ── */
+    .trend-text {
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 248, 0.5);
+      max-width: 45%;
+    }
+
+    /* ── Links / readings ── */
+    .readings {
+      font-size: 0.8rem;
+      line-height: 1.8;
+    }
+    .readings a {
+      color: var(--fg);
+      text-decoration: none;
+      border-bottom: 1px solid var(--fg-dim);
+      transition: border-color 0.3s;
+    }
+    .readings a:hover {
+      border-color: var(--fg);
+    }
+    .readings-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      margin-bottom: 12px;
+    }
+
   </style>
 </head>
 <body>
-  coming soon
+
+  <!-- Single drip line running the full page, starts below hero SVG legs -->
+  <div class="drip-line" id="dripLine">
+    <div class="drip-drop" id="pageDrop"></div>
+  </div>
+
+  <main>
+
+    <!-- ═══════ HERO ═══════ -->
+    <section class="hero">
+      <div class="hero-svg-container">
+        <svg viewBox="0 0 134 730" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Stand pole -->
+          <path d="M62.8926 16V647" stroke="#FFFFF8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Top hook -->
+          <path d="M62.8926 15.5306L106.893 5V48" stroke="#FFFFF8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Base legs -->
+          <path d="M62.5 647L82 598V615.5" stroke="#FFFFF8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M62.5 646.999L128.079 634.5V659" stroke="#FFFFF8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M94.8342 724.953V703L62.5008 647L10.0898 681V711.308" stroke="#FFFFF8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M62.5 647L8 615.531V637" stroke="#FFFFF8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Tray -->
+          <ellipse cx="63" cy="317.5" rx="63" ry="20" fill="#FFFFF8"/>
+          <!-- IV Bag -->
+          <path d="M99.6048 111.822C100.178 111.979 100.772 112.164 101.36 112.241C101.363 113.672 101.053 115.67 102.148 116.755C102.433 117.037 102.817 117.24 103.168 117.425C103.143 118.684 102.93 120.239 103.882 121.22C104.195 121.543 104.321 121.616 104.97 121.953C105.62 122.29 107.713 122.356 108.488 122.012C109.263 121.668 109.869 121.139 110.17 120.318C110.493 119.435 110.357 118.33 110.342 117.404C111.048 117.17 111.607 116.754 111.941 116.063C112.444 115.021 112.257 113.367 112.297 112.206C117.615 111.297 122.5 108.739 125.677 104.181C127.415 101.695 128.505 98.8013 128.845 95.7699C129.105 93.5909 128.976 91.4352 128.9 89.2494L128.693 82.8174L128.069 62.3981L127.762 51.5436L127.667 48.4259C127.647 47.6352 127.679 46.8014 127.546 46.0223C127.442 45.4097 127.13 44.9125 126.63 44.5546C125.729 43.9088 124.504 43.6898 123.453 43.4235C117.715 41.9688 110.666 41.2964 104.755 41.5539C99.9883 41.7557 95.304 42.2311 90.6462 43.3093C89.4567 43.5847 87.7561 43.7974 86.8931 44.7488C86.4663 45.2194 86.2967 45.6775 86.2399 46.3039C86.1046 47.796 86.1681 49.3501 86.1439 50.8499L85.9923 57.8498C85.8874 62.4992 85.7543 67.1478 85.5931 71.7954L85.1803 86.8269C85.116 89.3725 84.8955 91.9766 85.0594 94.5179C85.4037 99.5271 87.6642 104.199 91.3552 107.53C93.717 109.63 96.5965 111 99.6048 111.822Z" fill="#FFFFF8"/>
+          <!-- Tube drip line (animated dashes flowing down) -->
+          <path id="tubePath" class="drip-path" d="M107 119C97.5 140.5 112.5 245 99.5 283.5" stroke="#FFFFF8" stroke-width="2" stroke-miterlimit="3.99393" stroke-dasharray="5 5"/>
+
+          <!-- Combined path: tube bezier + straight fall to tray -->
+          <path id="dropMotionPath" d="M107 119C97.5 140.5 112.5 245 99.5 283.5 L63 317.5" fill="none" stroke="none"/>
+
+          <!-- Drop that follows the full path via animateMotion -->
+          <circle r="3" fill="#FFFFF8">
+            <animateMotion dur="1s" repeatCount="indefinite" rotate="auto" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.4 0 1 1">
+              <mpath href="#dropMotionPath"/>
+            </animateMotion>
+            <animate attributeName="opacity" dur="1s" repeatCount="indefinite" values="1;1;0" keyTimes="0;0.8;1"/>
+          </circle>
+
+          <!-- Splash ripple on tray surface, synced to 1s -->
+          <circle cx="63" cy="317" r="0" fill="none" stroke="#FFFFF8" stroke-width="1">
+            <animate attributeName="r" dur="1s" repeatCount="indefinite" values="0;12;18" keyTimes="0;0.85;1"/>
+            <animate attributeName="opacity" dur="1s" repeatCount="indefinite" values="0;0.6;0" keyTimes="0;0.85;1"/>
+          </circle>
+        </svg>
+      </div>
+
+      <h1>Drip Feed</h1>
+      <p class="subtitle" style="display: flex; width: 100%; gap: 24px;">
+        <span style="flex: 1; text-align: right;">Time as</span>
+        <span style="flex: 1; text-align: left;">a remedy</span>
+      </p>
+
+      <div class="credits" style="margin-top: 20px; display: flex; width: 100%; gap: 24px;">
+        <span style="flex: 1; text-align: right;"><a href="https://jiangqihan.cargo.site/" target="_blank" rel="noopener">Qihan Christoff Jiang</a></span>
+        <span style="flex: 1; text-align: left;"><a href="https://motion.sairamved.com" target="_blank" rel="noopener">Sai Ram Ved Vijapurapu</a></span>
+      </div>
+
+    </section>
+
+    <!-- ═══════ DESCRIPTION ═══════ -->
+    <section class="reveal">
+      <p class="desc">
+        <strong>Drip Feed</strong> is an installation on the idea of time as a remedy. It uses data from the <a href="https://www.bls.gov/tus/data/datafiles-2024.htm" target="_blank" rel="noopener"><em>2024 American Time Use Survey</em></a> to measure, for each hour of the day, how many people spend time <em>alone</em> versus <em>with others</em>.
+      </p>
+      <p class="desc-small" style="margin-top: 68px;">
+        These proportions are translated into LED drips once per second from a physical drip-feed into a digital display. Each second is segregated according to the measured ratio of alone time to shared time.
+      </p>
+    </section>
+
+    <!-- ═══════ DIGITAL TRANSLATION (CANVAS) ═══════ -->
+    <section class="reveal viz-section">
+      <div style="margin-bottom: 16px; display: flex; width: 100%; justify-content: space-between;">
+        <p class="viz-label">Physical → Digital</p>
+        <p class="viz-label" id="localClock"></p>
+      </div>
+
+      <div class="viz-frame">
+        <canvas id="vizCanvas"></canvas>
+        <div class="viz-labels-overlay">
+          <span class="viz-label">Alone</span>
+          <span class="viz-label">With Others</span>
+        </div>
+        <div class="viz-stat-bar">
+          <div class="viz-stat">
+            <span class="viz-stat-number" id="stat-alone">0</span>
+            <span class="viz-stat-label">Alone</span>
+          </div>
+          <div class="viz-stat">
+            <span class="viz-stat-number" id="stat-others">0</span>
+            <span class="viz-stat-label">With Others</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item" style="flex: 1; justify-content: flex-end;">
+          <div class="legend-circle-small"></div>
+          1 person
+        </div>
+        <div class="legend-item" style="flex: 1; justify-content: flex-start;">
+          <div class="legend-circle-large"></div>
+          60 people
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ THE TREND ═══════ -->
+    <section class="reveal">
+      <p class="trend-text">
+        The work is motivated by trends in data over the years where time spent with others is decreasing, while time spent alone is increasing across the board.
+      </p>
+    </section>
+
+    <!-- ═══════ PHOTOS ═══════ -->
+    <section class="reveal">
+      <div class="photo-frame">
+        <img src="assets/drip-feed-bts-1.png" alt="Drip Feed installation" loading="lazy">
+      </div>
+      <p class="desc-small" style="margin-top: 16px; max-width: 45%;">
+        This project was created as part of the class <a href="https://www.fddrsn.net/teaching/time/" target="_blank" rel="noopener">Time</a>, taught by <a href="https://www.fddrsn.net/" target="_blank" rel="noopener">Jeff Feddersen</a> at <a href="https://itp.nyu.edu/itp/" target="_blank" rel="noopener">NYU ITP</a>, and is currently on display at the <a href="https://hs-ny.org/" target="_blank" rel="noopener">Horological Society of New York</a>.
+      </p>
+    </section>
+
+    <!-- ═══════ INSPIRATION & READINGS ═══════ -->
+    <section class="reveal">
+      <div class="readings" style="max-width: 45%; margin-left: auto;">
+        <p class="readings-label">Inspiration &amp;<br>Further Reading</p>
+        <p style="margin-bottom: 12px;">
+          <a href="https://pudding.cool/2023/09/invisible-epidemic/" target="_blank" rel="noopener">Invisible Epidemic</a><br>
+          <span style="color: var(--fg-dim); font-size: 0.7rem;">Alvin Chang for The Pudding</span>
+        </p>
+        <p>
+          <a href="https://alexmiller.cv/gallery/finished/clock-poem/IMG_3537_Sub_01_3.html" target="_blank" rel="noopener">Clock Poem (2025)</a><br>
+          <span style="color: var(--fg-dim); font-size: 0.7rem;">Alex Miller</span>
+        </p>
+      </div>
+    </section>
+
+
+  </main>
+
+  <script>
+    // ══════════════════════════════════════
+    // Local clock
+    // ══════════════════════════════════════
+    function updateClock() {
+      const el = document.getElementById('localClock');
+      if (!el) return;
+      const now = new Date();
+      let h = now.getHours();
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      el.textContent = h + ' ' + ampm;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ══════════════════════════════════════
+    // Position drip line from SVG legs intersection
+    // ══════════════════════════════════════
+    function positionDripLine() {
+      const svgContainer = document.querySelector('.hero-svg-container');
+      if (!svgContainer) return;
+      const rect = svgContainer.getBoundingClientRect();
+      // Legs meet at y=647 in viewBox(0 0 134 730)
+      const legsY = rect.top + window.scrollY + (647 / 730) * rect.height;
+      const dripLine = document.getElementById('dripLine');
+      dripLine.style.top = legsY + 'px';
+      // bottom: 0 is set in CSS, so it stretches to end of page
+    }
+    // Run after layout settles
+    window.addEventListener('load', positionDripLine);
+    window.addEventListener('resize', positionDripLine);
+
+    // ══════════════════════════════════════
+    // Intersection Observer for reveal
+    // ══════════════════════════════════════
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ══════════════════════════════════════
+    // Canvas setup
+    // ══════════════════════════════════════
+    const aloneRatios = [
+      0.7357, 0.6641, 0.1272, 0.7901, 0.7985, 0.8272,
+      0.7288, 0.6583, 0.6422, 0.6593, 0.6598, 0.6351,
+      0.6262, 0.6306, 0.6158, 0.5836, 0.5784, 0.5226,
+      0.4839, 0.4605, 0.4834, 0.5487, 0.6101, 0.7054
+    ];
+
+    const canvas = document.getElementById('vizCanvas');
+    const ctx = canvas.getContext('2d');
+    const statAlone = document.getElementById('stat-alone');
+    const statOthers = document.getElementById('stat-others');
+
+    const SMALL_R = 8;
+    const LARGE_R = 14;
+    const FALL_ACCEL = 0.7;
+    const SIDE_FORCE = 0.05;
+    const REPULSION_FORCE = 1.2;
+    const REPULSION_RADIUS = 40;
+    const DAMPING = 0.88;
+    const SETTLE_Y_RATIO = 0.55;
+    const MAX_FALL_SPEED = 10;
+    const FRICTION = 0.87;
+    const LEFT_X_RATIO = 0.25;
+    const RIGHT_X_RATIO = 0.75;
+    const FG = '#FFFFF8';
+
+    let w, h, dpr;
+    let drops = [];
+    let largeCircles = [];
+    let aloneCount = 0;
+    let othersCount = 0;
+    let canvasVisible = false;
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      dpr = window.devicePixelRatio || 1;
+      w = rect.width;
+      h = rect.height;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const vizObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { canvasVisible = entry.isIntersecting; });
+    }, { threshold: 0.05 });
+    vizObserver.observe(canvas.parentElement);
+
+    function createDrop() {
+      const ratio = aloneRatios[new Date().getHours()] || 0.5;
+      const isAlone = Math.random() < ratio;
+      drops.push(new Drop(isAlone));
+      if (isAlone) { aloneCount++; statAlone.textContent = aloneCount; }
+      else { othersCount++; statOthers.textContent = othersCount; }
+    }
+
+    // ══════════════════════════════════════
+    // Unified drip: page drop + canvas drop in sync
+    // ══════════════════════════════════════
+    const pageDrop = document.getElementById('pageDrop');
+    const dripLine = document.getElementById('dripLine');
+
+    function getDripProgress() {
+      // Calculate what % down the drip line the canvas top is
+      const lineRect = dripLine.getBoundingClientRect();
+      const vizFrame = document.querySelector('.viz-frame');
+      if (!vizFrame || lineRect.height === 0) return 0.5;
+      const vizRect = vizFrame.getBoundingClientRect();
+      const vizTopInLine = (vizRect.top - lineRect.top) / lineRect.height;
+      return Math.max(0.05, Math.min(0.95, vizTopInLine));
+    }
+
+    // Animate the page drop with JS, fire createDrop when it reaches canvas
+    let dropAnimating = false;
+    let dropFired = false;
+
+    function startPageDrop() {
+      const triggerPoint = getDripProgress();
+      const duration = 1000; // 1s per drop cycle
+      const startTime = performance.now();
+      dropFired = false;
+
+      function tick(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / duration, 1);
+        // Ease-in for gravity feel
+        const eased = t * t;
+        const topPct = eased * 100;
+
+        pageDrop.style.top = topPct + '%';
+        pageDrop.style.opacity = 1;
+
+        // Fire createDrop when drop reaches canvas top
+        if (!dropFired && eased >= triggerPoint) {
+          dropFired = true;
+          if (canvasVisible) createDrop();
+        }
+
+        if (t < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          // Restart
+          requestAnimationFrame(() => startPageDrop());
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    // Start the drip loop after layout
+    window.addEventListener('load', () => {
+      startPageDrop();
+    });
+    // Also start immediately in case load already fired
+    if (document.readyState === 'complete') startPageDrop();
+
+    // ══════════════════════════════════════
+    // Drop & LargeCircle classes
+    // ══════════════════════════════════════
+    class Drop {
+      constructor(isAlone) {
+        this.x = w / 2;
+        this.y = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.isAlone = isAlone;
+        this.settled = false;
+        this.falling = true;
+        this.targetX = isAlone ? w * LEFT_X_RATIO : w * RIGHT_X_RATIO;
+        this.targetY = h * SETTLE_Y_RATIO;
+      }
+
+      update() {
+        if (this.settled) return;
+
+        if (this.falling && this.y < this.targetY) {
+          const progress = this.y / this.targetY;
+          this.vy += FALL_ACCEL * (1 + progress * progress);
+          if (this.vy > MAX_FALL_SPEED) this.vy = MAX_FALL_SPEED;
+        } else {
+          if (this.falling) {
+            this.falling = false;
+            this.vy *= 0.3;
+          }
+          const dx = this.targetX - this.x;
+          const dy = this.targetY - this.y;
+          this.vx += dx * SIDE_FORCE;
+          this.vy += dy * SIDE_FORCE * 0.5;
+        }
+
+        if (!this.falling) {
+          this.applyRepulsion(drops);
+          this.applyRepulsion(largeCircles);
+          this.vx *= FRICTION;
+          this.vy *= FRICTION;
+        } else {
+          this.vx *= DAMPING;
+        }
+
+        this.x += this.vx;
+        this.y += this.vy;
+        this.x = Math.max(SMALL_R, Math.min(w - SMALL_R, this.x));
+        this.y = Math.max(SMALL_R, Math.min(h - SMALL_R, this.y));
+
+        if (!this.falling && Math.abs(this.vx) < 0.3 && Math.abs(this.vy) < 0.3) {
+          this.settled = true;
+          this.vx = 0;
+          this.vy = 0;
+        }
+      }
+
+      applyRepulsion(others) {
+        for (let i = 0; i < others.length; i++) {
+          const other = others[i];
+          if (other === this) continue;
+          if (other instanceof Drop && !other.settled && other.falling) continue;
+
+          const dx = this.x - other.x;
+          const dy = this.y - other.y;
+          const distSq = dx * dx + dy * dy;
+          if (distSq > REPULSION_RADIUS * REPULSION_RADIUS) continue;
+
+          const d = Math.sqrt(distSq);
+          let minDist = SMALL_R * 2;
+          if (other instanceof LargeCircle) minDist = SMALL_R + LARGE_R;
+
+          if (d < minDist && d > 0) {
+            const overlap = minDist - d;
+            const force = overlap * 0.5;
+            this.vx += (dx / d) * force;
+            this.vy += (dy / d) * force;
+          } else if (d > 0) {
+            const force = (REPULSION_RADIUS - d) / REPULSION_RADIUS * REPULSION_FORCE;
+            this.vx += (dx / d) * force;
+            this.vy += (dy / d) * force;
+          }
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, SMALL_R, 0, Math.PI * 2);
+        if (this.isAlone) {
+          ctx.strokeStyle = FG;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = FG;
+          ctx.fill();
+        }
+      }
+    }
+
+    class LargeCircle {
+      constructor(x, y, isAlone) {
+        this.x = x;
+        this.y = y;
+        this.vx = 0;
+        this.vy = 0;
+        this.isAlone = isAlone;
+      }
+
+      update() {
+        this.applyRepulsion(largeCircles);
+        this.applyRepulsion(drops);
+        this.vx *= DAMPING;
+        this.vy *= DAMPING;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.x = Math.max(LARGE_R, Math.min(w - LARGE_R, this.x));
+        this.y = Math.max(LARGE_R, Math.min(h - LARGE_R, this.y));
+      }
+
+      applyRepulsion(others) {
+        for (const other of others) {
+          if (other === this) continue;
+          const dx = this.x - other.x;
+          const dy = this.y - other.y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          let minDist = LARGE_R * 2;
+          if (other instanceof Drop) minDist = LARGE_R + SMALL_R;
+
+          if (d < minDist && d > 0) {
+            const overlap = minDist - d;
+            const force = overlap * 0.5;
+            this.vx += (dx / d) * force;
+            this.vy += (dy / d) * force;
+          } else if (d < REPULSION_RADIUS && d > 0) {
+            const force = (REPULSION_RADIUS - d) / REPULSION_RADIUS * REPULSION_FORCE;
+            this.vx += (dx / d) * force;
+            this.vy += (dy / d) * force;
+          }
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, LARGE_R, 0, Math.PI * 2);
+        if (this.isAlone) {
+          ctx.strokeStyle = FG;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = FG;
+          ctx.fill();
+        }
+      }
+    }
+
+    function checkConsolidation() {
+      const leftSmall = drops.filter(d => d.settled && d.isAlone);
+      const rightSmall = drops.filter(d => d.settled && !d.isAlone);
+
+      if (leftSmall.length >= 60) {
+        const avgX = leftSmall.slice(0, 60).reduce((s, d) => s + d.x, 0) / 60;
+        const avgY = leftSmall.slice(0, 60).reduce((s, d) => s + d.y, 0) / 60;
+        largeCircles.push(new LargeCircle(avgX, avgY, true));
+        for (let i = 0; i < 60; i++) {
+          const idx = drops.indexOf(leftSmall[i]);
+          if (idx > -1) drops.splice(idx, 1);
+        }
+      }
+
+      if (rightSmall.length >= 60) {
+        const avgX = rightSmall.slice(0, 60).reduce((s, d) => s + d.x, 0) / 60;
+        const avgY = rightSmall.slice(0, 60).reduce((s, d) => s + d.y, 0) / 60;
+        largeCircles.push(new LargeCircle(avgX, avgY, false));
+        for (let i = 0; i < 60; i++) {
+          const idx = drops.indexOf(rightSmall[i]);
+          if (idx > -1) drops.splice(idx, 1);
+        }
+      }
+    }
+
+    function resetViz() {
+      drops = [];
+      largeCircles = [];
+      aloneCount = 0;
+      othersCount = 0;
+      statAlone.textContent = '0';
+      statOthers.textContent = '0';
+    }
+
+    let frameCount = 0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (!canvasVisible) return;
+
+      if (largeCircles.length >= 60) resetViz();
+
+      ctx.clearRect(0, 0, w, h);
+
+      for (let i = drops.length - 1; i >= 0; i--) {
+        drops[i].update();
+        drops[i].draw();
+      }
+
+      for (let i = largeCircles.length - 1; i >= 0; i--) {
+        largeCircles[i].update();
+        largeCircles[i].draw();
+      }
+
+      frameCount++;
+      if (frameCount % 10 === 0) checkConsolidation();
+    }
+
+    requestAnimationFrame(animate);
+  </script>
+
 </body>
 </html>

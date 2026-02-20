@@ -2,7 +2,7 @@
 
 // ===== CONFIGURATION =====
 // Set to true to use Raspberry Pi WebSocket, false to use system clock
-const USE_RASPBERRY_PI = true;
+const USE_RASPBERRY_PI = false;
 // =========================
 
 const SMALL_CIRCLE_RADIUS = 8;

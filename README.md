@@ -1,13 +1,21 @@
 # Drip Feed
 
-A physical installation sketch that will be shown at the [Horological Society of New York](https://hs-ny.org/).
+**Time as a remedy**
+
+By [Qihan Christoff Jiang](https://jiangqihan.cargo.site/) & [Sai Ram Ved Vijapurapu](https://motion.sairamved.com)
 
 ## About
 
-This piece explores the relationship between time and loneliness through an interactive installation.
+Drip Feed is an installation on the idea of time as a remedy. It uses data from the [2024 American Time Use Survey](https://www.bls.gov/tus/data/datafiles-2024.htm) to measure, for each hour of the day, how many people spend time *alone* versus *with others*.
+
+These proportions are translated into LED drips once per second from a physical drip-feed into a digital display. Each second is segregated according to the measured ratio of alone time to shared time.
+
+The work is motivated by trends in data over the years where time spent with others is decreasing, while time spent alone is increasing across the board.
 
 ## Components
 
-- Web-based visualization
-- Arduino LED control
-- Time-based data from [American Time Use Survey](https://www.bls.gov/tus/)
+- Physical IV drip stand with LED strip and LCD screen
+- Web-based data visualization (accessed via QR code at the installation)
+- Data from the [2024 American Time Use Survey](https://www.bls.gov/tus/data/datafiles-2024.htm)
+
+Created as part of the class [Time](https://www.fddrsn.net/teaching/time/), taught by [Jeff Feddersen](https://www.fddrsn.net/) at [NYU ITP](https://itp.nyu.edu/itp/), and is currently on display at the [Horological Society of New York](https://hs-ny.org/).
