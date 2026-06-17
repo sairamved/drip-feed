@@ -470,41 +470,43 @@
     </section>
 
     <!-- ═══════ DIGITAL TRANSLATION (CANVAS) ═══════ -->
-    <section class="reveal viz-section">
-      <div style="margin-bottom: 16px; display: flex; width: 100%; justify-content: space-between;">
-        <p class="viz-label">Physical → Digital</p>
-        <p class="viz-label" id="localClock"></p>
-      </div>
+    <div id="viz-container"></div>
+      <section class="reveal viz-section">
+        <div style="margin-bottom: 16px; display: flex; width: 100%; justify-content: space-between;">
+          <p class="viz-label">Physical → Digital</p>
+          <p class="viz-label" id="localClock"></p>
+        </div>
 
-      <div class="viz-frame">
-        <canvas id="vizCanvas"></canvas>
-        <div class="viz-labels-overlay">
-          <span class="viz-label">Alone</span>
-          <span class="viz-label">With Others</span>
-        </div>
-        <div class="viz-stat-bar">
-          <div class="viz-stat">
-            <span class="viz-stat-number" id="stat-alone">0</span>
-            <span class="viz-stat-label">Alone</span>
+        <div class="viz-frame">
+          <canvas id="vizCanvas"></canvas>
+          <div class="viz-labels-overlay">
+            <span class="viz-label">Alone</span>
+            <span class="viz-label">With Others</span>
           </div>
-          <div class="viz-stat">
-            <span class="viz-stat-number" id="stat-others">0</span>
-            <span class="viz-stat-label">With Others</span>
+          <div class="viz-stat-bar">
+            <div class="viz-stat">
+              <span class="viz-stat-number" id="stat-alone">0</span>
+              <span class="viz-stat-label">Alone</span>
+            </div>
+            <div class="viz-stat">
+              <span class="viz-stat-number" id="stat-others">0</span>
+              <span class="viz-stat-label">With Others</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="legend">
-        <div class="legend-item" style="flex: 1; justify-content: flex-end;">
-          <div class="legend-circle-small"></div>
-          1 person
+        <div class="legend">
+          <div class="legend-item" style="flex: 1; justify-content: flex-end;">
+            <div class="legend-circle-small"></div>
+            1 person
+          </div>
+          <div class="legend-item" style="flex: 1; justify-content: flex-start;">
+            <div class="legend-circle-large"></div>
+            60 people
+          </div>
         </div>
-        <div class="legend-item" style="flex: 1; justify-content: flex-start;">
-          <div class="legend-circle-large"></div>
-          60 people
-        </div>
-      </div>
-    </section>
+      </section>
+    </div>
 
     <!-- ═══════ THE TREND ═══════ -->
     <section class="reveal">
